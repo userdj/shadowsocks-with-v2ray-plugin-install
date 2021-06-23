@@ -3,13 +3,13 @@
 # Check system
 if [ ! -f /etc/lsb-release ];then
     if ! grep -Eqi "ubuntu|debian" /etc/issue;then
-        echo "\033[1;31mOnly Ubuntu or Debian can run this shell.\033[0m"
+        echo "\033[1;31mEste script solo puede correr en Ubuntu o Debian.\033[0m"
         exit 1
     fi
 fi
 
 # Make sure only root can run our script
-[ `whoami` != "root" ] && echo "\033[1;31mThis script must be run as root.\033[0m" && exit 1
+[ `whoami` != "root" ] && echo "\033[1;31Necesitas root para comenzar la instalación.\033[0m" && exit 1
 
 # Version
 LIBSODIUM_VER=stable
@@ -23,23 +23,23 @@ get_latest_ver(){
 
 # Set shadowsocks-libev config password
 set_password(){
-    echo "\033[1;34mPlease enter password for shadowsocks-libev:\033[0m"
-    read -p "(Default password: M3chD09):" shadowsockspwd
-    [ -z "${shadowsockspwd}" ] && shadowsockspwd="M3chD09"
+    echo "\033[1;34mPor favor introduce una contraseña para shadowsocks-libev:\033[0m"
+    read -p "(Contraseña predefinida: Pepe):" shadowsockspwd
+    [ -z "${shadowsockspwd}" ] && shadowsockspwd="Pepe"
     echo "\033[1;35mpassword = ${shadowsockspwd}\033[0m"
 }
 
 # Set domain
 set_domain(){
-    echo "\033[1;34mPlease enter your domain:\033[0m"
-    echo "If you don't have one, you can register one for free at:"
+    echo "\033[1;34mPor favor ingresa tu dominio:\033[0m"
+    echo "Si no lo tienes, puedes conseguir uno en:"
     echo "https://my.freenom.com/clientarea.php"
     read domain
     str=`echo $domain | grep '^\([a-zA-Z0-9_\-]\{1,\}\.\)\{1,\}[a-zA-Z]\{2,5\}'`
     while [ ! -n "${str}" ]
     do
-        echo "\033[1;31mInvalid domain.\033[0m"
-        echo "\033[1;31mPlease try again:\033[0m"
+        echo "\033[1;31mDominio invalido.\033[0m"
+        echo "\033[1;31mIntenta nuevamente:\033[0m"
         read domain
         str=`echo $domain | grep '^\([a-zA-Z0-9_\-]\{1,\}\.\)\{1,\}[a-zA-Z]\{2,5\}'`
     done
@@ -48,8 +48,8 @@ set_domain(){
 
 # Pre-installation
 pre_install(){
-    read -p "Press any key to start the installation." a
-    echo "\033[1;34mStart installing. This may take a while.\033[0m"
+    read -p "Presiona cualquier tecla para iniciar la instalación." a
+    echo "\033[1;34mComenzando. Esto tomará un momento.\033[0m"
     apt-get update
     apt-get install -y --no-install-recommends gettext build-essential autoconf libtool libpcre3-dev asciidoc xmlto libev-dev libc-ares-dev automake
 }
@@ -58,7 +58,7 @@ pre_install(){
 # Installation of Libsodium
 install_libsodium(){
     if [ -f /usr/lib/libsodium.a ] || [ -f /usr/lib64/libsodium.a ];then
-        echo "\033[1;32mLibsodium already installed, skip.\033[0m"
+        echo "\033[1;32mLibsodium ya instalado, Omitiendo.\033[0m"
     else
         if [ ! -f libsodium-$LIBSODIUM_VER.tar.gz ];then
             wget https://download.libsodium.org/libsodium/releases/LATEST.tar.gz -O libsodium-$LIBSODIUM_VER.tar.gz
@@ -70,7 +70,7 @@ install_libsodium(){
         cd ..
         ldconfig
         if [ ! -f /usr/lib/libsodium.a ] && [ ! -f /usr/lib64/libsodium.a ];then
-            echo "\033[1;31mFailed to install libsodium.\033[0m"
+            echo "\033[1;31mLa instalación de libsodium ha fallado.\033[0m"
             exit 1
         fi
     fi
@@ -80,7 +80,7 @@ install_libsodium(){
 # Installation of MbedTLS
 install_mbedtls(){
     if [ -f /usr/lib/libmbedtls.a ];then
-        echo "\033[1;32mMbedTLS already installed, skip.\033[0m"
+        echo "\033[1;32mMbedTLS ya instalado, Omitiendo.\033[0m"
     else
         if [ ! -f mbedtls-$MBEDTLS_VER-gpl.tgz ];then
             wget https://tls.mbed.org/download/mbedtls-$MBEDTLS_VER-gpl.tgz
@@ -92,7 +92,7 @@ install_mbedtls(){
         cd ..
         ldconfig
         if [ ! -f /usr/lib/libmbedtls.a ];then
-            echo "\033[1;31mFailed to install MbedTLS.\033[0m"
+            echo "\033[1;31mLa instalación de MbedTLS ha fallado.\033[0m"
             exit 1
         fi
     fi
@@ -102,7 +102,7 @@ install_mbedtls(){
 # Installation of shadowsocks-libev
 install_ss(){
     if [ -f /usr/local/bin/ss-server ];then
-        echo "\033[1;32mShadowsocks-libev already installed, skip.\033[0m"
+        echo "\033[1;32mShadowsocks-libev ya instalado, Omitiendo.\033[0m"
     else
         if [ ! -f $ss_file ];then
             ss_url=$(wget -qO- https://api.github.com/repos/shadowsocks/shadowsocks-libev/releases/latest | grep browser_download_url | cut -f4 -d\")
@@ -114,7 +114,7 @@ install_ss(){
         make install
         cd ..
         if [ ! -f /usr/local/bin/ss-server ];then
-            echo "\033[1;31mFailed to install shadowsocks-libev.\033[0m"
+            echo "\033[1;31mLa instalación de shadowsocks-libev ha fallado.\033[0m"
             exit 1
         fi
     fi
@@ -124,7 +124,7 @@ install_ss(){
 # Installation of v2ray-plugin
 install_v2(){
     if [ -f /usr/local/bin/v2ray-plugin ];then
-        echo "\033[1;32mv2ray-plugin already installed, skip.\033[0m"
+        echo "\033[1;32mv2ray-plugin ya instalado, Omitiendo.\033[0m"
     else
         if [ ! -f $v2_file ];then
             v2_url=$(wget -qO- https://api.github.com/repos/shadowsocks/v2ray-plugin/releases/latest | grep linux-amd64 | grep browser_download_url | cut -f4 -d\")
@@ -133,7 +133,7 @@ install_v2(){
         tar xf $v2_file
         mv v2ray-plugin_linux_amd64 /usr/local/bin/v2ray-plugin
         if [ ! -f /usr/local/bin/v2ray-plugin ];then
-            echo "\033[1;31mFailed to install v2ray-plugin.\033[0m"
+            echo "\033[1;31mLa instalación de v2ray-plugin ha fallado.\033[0m"
             exit 1
         fi
     fi
@@ -168,7 +168,7 @@ EOF
 
 get_cert(){
     if [ -f /etc/letsencrypt/live/$domain/fullchain.pem ];then
-        echo "\033[1;32mcert already got, skip.\033[0m"
+        echo "\033[1;32mcert ya obtenido. Omitiendo.\033[0m"
     else
         apt-get update
         if grep -Eqi "ubuntu" /etc/issue;then
@@ -182,7 +182,7 @@ get_cert(){
         systemctl enable certbot.timer
         systemctl start certbot.timer
         if [ ! -f /etc/letsencrypt/live/$domain/fullchain.pem ];then
-            echo "\033[1;31mFailed to get cert.\033[0m"
+            echo "\033[1;31mLa certificación ha fallado.\033[0m"
             exit 1
         fi
     fi
@@ -204,14 +204,14 @@ remove_files(){
 
 print_ss_info(){
     clear
-    echo "\033[1;32mCongratulations, Shadowsocks-libev server install completed\033[0m"
-    echo "Your Server IP        :  ${domain} "
-    echo "Your Server Port      :  443 "
-    echo "Your Password         :  ${shadowsockspwd} "
-    echo "Your Encryption Method:  aes-256-gcm "
-    echo "Your Plugin           :  v2ray-plugin"
-    echo "Your Plugin options   :  tls;host=${domain}"
-    echo "Enjoy it!"
+    echo "\033[1;32mFelicitaciones, Shadowsocks-libev se ha instalado e iniciado con éxito\033[0m"
+    echo "IP del servidor       :  ${domain} "
+    echo "Puerto                :  443 "
+    echo "Contraseña            :  ${shadowsockspwd} "
+    echo "Método de encriptación:  aes-256-gcm "
+    echo "Plugin                :  v2ray-plugin"
+    echo "Opciones del plugim   :  tls;host=${domain}"
+    echo "Disfruta!"
 }
 
 install_all(){
@@ -254,14 +254,14 @@ remove_all(){
     rm -f /usr/local/share/man/man8/shadowsocks-libev.8
     rm -fr /usr/local/share/doc/shadowsocks-libev
     rm -f /usr/lib/systemd/system/shadowsocks.service
-    echo "\033[1;32mRemove success!\033[0m"
+    echo "\033[1;32mBorrado completo!\033[0m"
 }
 
 clear
-echo "What do you want to do?"
-echo "[1] Install"
-echo "[2] Remove"
-read -p "(Default option: Install):" option
+echo "Que quieres hacer?"
+echo "[1] Instalar"
+echo "[2] Remover"
+read -p "(Default option: Instalar):" option
 option=${option:-1}
 if [ $option -eq 2 ];then
     remove_all
