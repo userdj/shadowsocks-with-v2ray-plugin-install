@@ -261,7 +261,7 @@ clear
 echo "Que quieres hacer?"
 echo "[1] Instalar"
 echo "[2] Remover"
-read -p "(Default option: Instalar):" option
+read -p "(Opción predefinida : Instalar):" option
 option=${option:-1}
 if [ $option -eq 2 ];then
     remove_all
